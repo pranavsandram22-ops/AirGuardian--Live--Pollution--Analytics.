@@ -15,13 +15,19 @@ model = joblib.load("aqi_model.pkl")
 # Earth Engine
 # ---------------------------
 import ee
+import json
 
-
-PROJECT_ID = "airguardian-ai"
-
-# Initialize only if not already initialized
+# Initialize Earth Engine using Streamlit Secrets
 if not ee.data.is_initialized():
-    ee.Initialize(project=PROJECT_ID)
+    service_account = dict(st.secrets["gcp_service_account"])
+    credentials = ee.ServiceAccountCredentials(
+        service_account["client_email"],
+        key_data=json.dumps(service_account)
+    )
+    ee.Initialize(
+        credentials=credentials,
+        project=service_account["project_id"]
+    )
 # ---------------------------
 # Kerala Boundary
 # ---------------------------
